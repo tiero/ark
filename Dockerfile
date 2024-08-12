@@ -12,8 +12,13 @@ WORKDIR /app
 COPY . .
 
 ENV GOPROXY=https://goproxy.io,direct
-RUN cd server && CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-X 'main.Version=${VERSION}' -X 'main.Commit=${COMMIT}' -X 'main.Date=${DATE}'" -o ../bin/arkd ./cmd/arkd
-RUN cd client && CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-X 'main.Version=${VERSION}}' -X 'main.Commit=${COMMIT}' -X 'main.Date=${DATE}'" -o ../bin/ark .
+RUN echo "Building on $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+RUN cd server && CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
+    -ldflags="-X 'main.Version=${VERSION}' -X 'main.Commit=${COMMIT}' -X 'main.Date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')'" \
+    -o ../bin/arkd ./cmd/arkd
+RUN cd client && CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
+    -ldflags="-X 'main.Version=${VERSION}' -X 'main.Commit=${COMMIT}' -X 'main.Date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')'" \
+    -o ../bin/ark .
 
 # Second image, running the arkd executable
 FROM alpine:3.12
