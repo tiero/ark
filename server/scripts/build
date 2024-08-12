@@ -9,6 +9,8 @@ PARENT_PATH=$(dirname $(
 
 # Set VERSION (you can modify this to get the version from a file or environment variable)
 VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "unknown")
+COMMIT=${COMMIT:-$(git rev-parse HEAD)}
+DATE=${DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
 
 # Get OS and ARCH
 OS=$(go env GOOS)
@@ -16,6 +18,9 @@ ARCH=$(go env GOARCH)
 
 echo "Building arkd for $OS $ARCH"
 echo "Version: $VERSION"
+echo "Commit: $COMMIT"
+echo "Date: $DATE"
+
 
 # Change to the parent directory
 pushd $PARENT_PATH
@@ -24,7 +29,7 @@ pushd $PARENT_PATH
 mkdir -p build
 
 # Build the binary with version information
-go build -ldflags="-s -w -X 'main.Version=$VERSION'" -o build/arkd-$OS-$ARCH ./cmd/arkd
+go build -ldflags="-s -w -X 'main.Version=$VERSION' -X 'main.Commit=$COMMIT' -X 'main.Date=$DATE'" -o build/arkd-$OS-$ARCH ./cmd/arkd
 
 echo "Build complete: build/arkd-$OS-$ARCH"
 
